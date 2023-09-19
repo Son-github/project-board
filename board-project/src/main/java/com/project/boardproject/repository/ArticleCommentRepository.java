@@ -2,7 +2,9 @@ package com.project.boardproject.repository;
 
 import com.project.boardproject.domain.ArticleComment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+@RepositoryRestResource
 public interface ArticleCommentRepository extends JpaRepository<ArticleComment,Long> {}
 /*
     Repository는 Entity를 만들고 그 Entity에서 CRUD를 하기 위해서 만든다.
