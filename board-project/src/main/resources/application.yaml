@@ -25,11 +25,8 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true # ??? ???
-        default_batch_fetch_size: 100 # ??? ?? ????
-  h2:
-    console:
-      enabled: false
+        format_sql: true
+        default_batch_fetch_size: 100
   sql:
     init:
       mode: always
