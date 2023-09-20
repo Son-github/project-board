@@ -3,6 +3,7 @@ package com.project.boardproject.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -27,7 +28,8 @@ public class ArticleComment extends AuditingField{
     private Long id;
 
     @Setter @ManyToOne(optional = false) private Article article; // 게시글 (ID)
-    @Setter @Column(nullable = false, length = 500) private String content; // 내용
+    @Setter @Column(nullable = false, length = 1500) private String content; // 내용
+
 
     protected ArticleComment() {}
 
@@ -35,6 +37,7 @@ public class ArticleComment extends AuditingField{
         this.article = article;
         this.content = content;
     }
+
 
     public static ArticleComment of(Article article, String content) {
         return new ArticleComment(article, content);
