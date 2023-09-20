@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import javax.persistence.AssociationOverride;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +36,7 @@ class JpaRepositoryTest {
         // Test
         assertThat(articles)
                 .isNotNull()
-                .hasSize(103);
+                .hasSize(100);
 
     }
 
@@ -77,6 +76,8 @@ class JpaRepositoryTest {
         // Given
         Article article = articleRepository.findById(1L).orElseThrow();
         long previousArticleCount = articleRepository.count();
+        long previousArticleCommentCount = articleCommentRepository.count();
+        int deletedCommentSize = article.getArticleComments().size();
 
         // When
         articleRepository.delete(article);
@@ -84,5 +85,7 @@ class JpaRepositoryTest {
         // Test
         assertThat(articleRepository.count())
                 .isEqualTo(previousArticleCount - 1);
+        assertThat(articleCommentRepository.count())
+                .isEqualTo(previousArticleCommentCount- deletedCommentSize);
     }
 }

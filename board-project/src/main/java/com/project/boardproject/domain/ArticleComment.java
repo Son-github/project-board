@@ -22,13 +22,14 @@ import java.util.Objects;
         @Index(columnList = "createdBy")
 })
 @Entity
-public class ArticleComment extends AuditingField{
+public class ArticleComment extends AuditingFields{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Setter @ManyToOne(optional = false) private Article article; // 게시글 (ID)
-    @Setter @Column(nullable = false, length = 1500) private String content; // 내용
+    @Setter @Column(nullable = false, length = 100) private String content; // 내용
 
 
     protected ArticleComment() {}
@@ -47,7 +48,7 @@ public class ArticleComment extends AuditingField{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ArticleComment that)) return false;
-        return id != null && Objects.equals(id, that.id);
+        return Objects.equals(id, that.id);
     }
 
     @Override

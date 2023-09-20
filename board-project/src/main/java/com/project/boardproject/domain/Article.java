@@ -10,7 +10,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +23,8 @@ import java.util.Set;
         @Index(columnList = "createdBy")
 })
 @Entity
-public class Article extends AuditingField{ // 상속을 이용
+public class Article extends AuditingFields { // 상속을 이용
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,7 +55,7 @@ public class Article extends AuditingField{ // 상속을 이용
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Article article)) return false;
-        return id != null && Objects.equals(id, article.id); // 서로 다른 두 엔티티가 같을 조건은?
+        return Objects.equals(id, article.id); // 서로 다른 두 엔티티가 같을 조건은?
     }
 
     @Override
