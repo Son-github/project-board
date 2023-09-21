@@ -199,3 +199,5 @@ insert into article_comment (article_id, content, created_by, modified_at, creat
 insert into article_comment (article_id, content, created_by, modified_at, created_at, modified_by) values (37, 'Audi', 'Meredeth', '2022-12-15 17:41:53', '2023-09-09 16:17:11', 'Dougie');
 insert into article_comment (article_id, content, created_by, modified_at, created_at, modified_by) values (48, 'Cadillac', 'Araldo', '2023-01-07 14:30:08', '2023-04-29 19:46:28', 'Josh');
 insert into article_comment (article_id, content, created_by, modified_at, created_at, modified_by) values (2, 'Pontiac', 'Jud', '2023-04-01 11:53:40', '2023-03-19 13:03:41', 'Heather');
+
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('son', 'a111', 'son', 'son@gmail.com', 'I am Son.', now(), 'son', now(), 'son');
