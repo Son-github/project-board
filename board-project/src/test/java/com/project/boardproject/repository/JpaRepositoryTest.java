@@ -2,11 +2,13 @@ package com.project.boardproject.repository;
 
 import com.project.boardproject.config.JpaConfig;
 import com.project.boardproject.domain.Article;
+import com.project.boardproject.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -19,10 +21,12 @@ class JpaRepositoryTest {
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
-    public JpaRepositoryTest(@Autowired ArticleRepository articleRepository, @Autowired ArticleCommentRepository articleCommentRepository) {
+    public JpaRepositoryTest(@Autowired ArticleRepository articleRepository, @Autowired ArticleCommentRepository articleCommentRepository, @Autowired UserAccountRepository userAccountRepository) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Test
@@ -32,11 +36,16 @@ class JpaRepositoryTest {
 
         // When
         List<Article> articles = articleRepository.findAll();
+        List<UserAccount> userAccounts = userAccountRepository.findAll();
 
         // Test
         assertThat(articles)
                 .isNotNull()
                 .hasSize(100);
+
+        assertThat(userAccounts)
+                .isNotNull()
+                .hasSize(1);
 
     }
 
