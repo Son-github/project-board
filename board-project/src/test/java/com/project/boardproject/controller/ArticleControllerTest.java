@@ -35,7 +35,6 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("articles"));  // articles라는 값을 하나 넘겨주어야함
     }
 
-    @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
     @Test
     public void givenNothing_whenRequestingArticleView_thenReturnArticleView() throws Exception {
