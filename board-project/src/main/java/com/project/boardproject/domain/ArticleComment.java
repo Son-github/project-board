@@ -15,7 +15,7 @@ import java.util.Objects;
         @Index(columnList = "createdBy")
 })
 @Entity
-public class ArticleComment extends AuditingFields{
+public class ArticleComment extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +23,14 @@ public class ArticleComment extends AuditingFields{
 
     @Setter @ManyToOne(optional = false) private Article article; // 게시글 (ID)
     @Setter @ManyToOne(optional = false) private UserAccount userAccount; // 유저 정보(ID)
-    @Setter @Column(nullable = false, length = 100) private String content; // 내용
+    @Setter @Column(nullable = false, length = 500) private String content; // 내용
 
 
     protected ArticleComment() {}
 
     private ArticleComment(Article article, UserAccount userAccount, String content) {
-        this.userAccount = userAccount;
         this.article = article;
+        this.userAccount = userAccount;
         this.content = content;
     }
 
