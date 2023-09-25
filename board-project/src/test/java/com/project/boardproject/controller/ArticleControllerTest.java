@@ -1,15 +1,28 @@
 package com.project.boardproject.controller;
 
 import com.project.boardproject.config.SecurityConfig;
+import com.project.boardproject.dto.ArticleWithCommentsDto;
+import com.project.boardproject.dto.UserAccountDto;
+import com.project.boardproject.service.ArticleService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -20,6 +33,8 @@ class ArticleControllerTest {
 
     private final MockMvc mvc;
 
+    @MockBean private ArticleService articleService;
+
     public ArticleControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
     }
@@ -29,27 +44,32 @@ class ArticleControllerTest {
     @Test
     public void givenNothing_whenRequestingArticlesView_thenReturnArticlesView() throws Exception {
         // Given
+        given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
 
         // When & Then
         mvc.perform(get("/articles"))
                 .andExpect(status().isOk()) // 200 Ok
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)) // TEXT_HTML 컨텐츠 타입
                 .andExpect(view().name("articles/index")) // view는 articles/index에 있어야 함
-                .andExpect(model().attributeExists("articles"));  // articles라는 값을 하나 넘겨주어야함
+                .andExpect(model().attributeExists("articles")); // articles라는 값을 하나 넘겨주어야함
+        then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
     }
 
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
     @Test
     public void givenNothing_whenRequestingArticleView_thenReturnArticleView() throws Exception {
         // Given
+        Long articleId = 1L;
+        given(articleService.getArticle(articleId)).willReturn(createArticleWithComments());
 
         // When & Then
-        mvc.perform(get("/articles/1"))
+        mvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
+        then(articleService).should().getArticle(articleId);
     }
 
     @Disabled("구현 중")
@@ -91,4 +111,36 @@ class ArticleControllerTest {
         mvc.perform(patch("/api/userAccounts")).andExpect(status().isNotFound());
         mvc.perform(delete("/api/userAccounts")).andExpect(status().isNotFound());
     }
+
+    private ArticleWithCommentsDto createArticleWithComments() {
+        return ArticleWithCommentsDto.of(
+                1L,
+                createUserAccountDto(),
+                Set.of(),
+                "title",
+                "content",
+                "#green",
+                LocalDateTime.now(),
+                "son",
+                LocalDateTime.now(),
+                "son"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
+                "son",
+                "pw",
+                "son@gmail.com",
+                "Son",
+                "memo",
+                LocalDateTime.now(),
+                "son",
+                LocalDateTime.now(),
+                "son"
+        );
+    }
+
+
 }
