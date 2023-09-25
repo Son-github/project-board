@@ -5,7 +5,7 @@ import com.project.boardproject.domain.UserAccount;
 
 import java.time.LocalDateTime;
 
-public record ArticleDto(
+public record ArticleDto( //record?
         Long id,
         UserAccountDto userAccountDto,
         String title,

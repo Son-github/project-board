@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@DisplayName("View RootController")
 @Import(SecurityConfig.class)
 @WebMvcTest(MainController.class)
 class MainControllerTest {
@@ -20,17 +21,16 @@ class MainControllerTest {
 
     MainControllerTest(@Autowired MockMvc mvc) {this.mvc = mvc;} // Autowired?
 
-    @DisplayName("홈 버튼 -> 게시판 페이지로 redirection")
+    @DisplayName("[view][GET] 루트 페이지 -> 게시글 리스트 (게시판) 페이지 Redirection")
     @Test
-    void givenRootPath_whenRequestingRootPage_thenRedirectstoArticlesPage() throws Exception {
+    void givenNothing_whenRequestingRootPage_thenRedirectsToArticlesPage() throws Exception {
         // Given
 
         // When & Then
         mvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("forward:/articles"))
-                .andExpect(forwardedUrl("/articles"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(forwardedUrl("/articles"));
     }
 
 }
