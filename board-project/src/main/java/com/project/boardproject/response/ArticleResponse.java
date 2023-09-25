@@ -5,7 +5,7 @@ import com.project.boardproject.dto.ArticleDto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public record ArticleResponse(
+public record ArticleResponse( // Mapper
         Long id,
         String title,
         String content,
