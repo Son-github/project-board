@@ -28,15 +28,13 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
             return articleRepository.findAll(pageable).map(ArticleDto::from);
         }
 
-        switch (searchType) {
+        return switch (searchType) {
             case TITLE -> articleRepository.findByTitleContaining(searchKeyword, pageable).map(ArticleDto::from); // 이 것은 무엇?
             case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
             case HASHTAG -> articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDto::from);
-        }
-
-        return Page.empty();
+        };
     }
 
     @Transactional(readOnly = true)
