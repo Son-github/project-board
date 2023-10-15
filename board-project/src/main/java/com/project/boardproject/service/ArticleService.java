@@ -1,10 +1,12 @@
 package com.project.boardproject.service;
 
 import com.project.boardproject.domain.Article;
-import com.project.boardproject.domain.type.SearchType;
+import com.project.boardproject.domain.UserAccount;
+import com.project.boardproject.domain.constant.SearchType;
 import com.project.boardproject.dto.ArticleDto;
 import com.project.boardproject.dto.ArticleWithCommentsDto;
 import com.project.boardproject.repository.ArticleRepository;
+import com.project.boardproject.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ArticleService {  // command+shift+t를 누르면 동일한 위치에 test파일 생성
 
     private final ArticleRepository articleRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -39,19 +42,28 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
     }
 
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticle(long articleId) {
+    public ArticleWithCommentsDto getArticleWithComments(Long articleId) {
         return articleRepository.findById(articleId)
                 .map(ArticleWithCommentsDto::from)
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다. - articleId: " + articleId));
     }
 
-    public void saveArticle(ArticleDto dto) {
-        articleRepository.save(dto.toEntity());
+    @Transactional(readOnly = true)
+    public ArticleDto getArticle(Long articleId) {
+        return articleRepository.findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " +  articleId));
     }
 
-    public void updateArticle(ArticleDto dto) {
+    public void saveArticle(ArticleDto dto) {
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        articleRepository.save(dto.toEntity(userAccount));
+
+    }
+
+    public void updateArticle(Long articleId, ArticleDto dto) {
         try {
-            Article article = articleRepository.getReferenceById(dto.id());
+            Article article = articleRepository.getReferenceById(articleId);
             if (dto.title() != null) {article.setTitle(dto.title());}
             if (dto.content() != null) {article.setContent(dto.content());}
             article.setHashtag(dto.hashtag());
@@ -62,6 +74,10 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
 
     public void deleteArticle(long articleId) {
         articleRepository.deleteById(articleId);
+    }
+
+    public long getArticleCount() {
+        return articleRepository.count();
     }
 
 
@@ -77,4 +93,5 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
     public List<String> getHashtags() {
         return articleRepository.findAllDistinctHashtags();
     }
+
 }
