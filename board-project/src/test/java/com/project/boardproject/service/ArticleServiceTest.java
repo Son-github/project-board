@@ -1,5 +1,7 @@
 package com.project.boardproject.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.project.boardproject.domain.Article;
 import com.project.boardproject.domain.UserAccount;
 import com.project.boardproject.domain.constant.SearchType;
@@ -30,6 +32,8 @@ import static org.mockito.BDDMockito.*;
 @DisplayName("비즈니스 로직 - 게시글")
 @ExtendWith(MockitoExtension.class) // mocking이 무엇?
 class ArticleServiceTest {
+
+    Logger log = LoggerFactory.getLogger(ArticleServiceTest.class);
     
     @InjectMocks private ArticleService sut; // parameter?
     @Mock private ArticleRepository articleRepository; // final은 뭐야?
@@ -193,23 +197,26 @@ class ArticleServiceTest {
         Article article = createArticle();
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "springboot");
         given(articleRepository.getReferenceById(dto.id())).willReturn(article); // Reference?
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
 
         // When
         sut.updateArticle(dto.id(), dto);
 
         // Then
+        //log.info("과연 dto는 변경 되었나요? title: {}", dto.title());
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", dto.title())
                 .hasFieldOrPropertyWithValue("content", dto.content())
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(articleRepository).should().getReferenceById(dto.id());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
     }
 
     @DisplayName("없는 게시글의 수정 정보를 입력하면, 경고 로그를 찍고 아무 것도 하지 않는다.")
     @Test
     void givenNonexistentArticleInfo_whenUpdatingArticle_thenLogsWarningAndDoesNothing() {
         // Given
-        ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "springboot");
+        ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
         given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
@@ -224,15 +231,16 @@ class ArticleServiceTest {
     void givenArticleInfo_whenInsertingArticle_thenDeleteArticle() {
         // Given
         Long articleId = 1L;
-        willDoNothing().given(articleRepository).deleteById(articleId);
+        String userId = "uno";
+        willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(articleId, userId);
 
         // willDoNothing, willReturn??
 
         // When
-        sut.deleteArticle(1L);
+        sut.deleteArticle(1L, userId);
 
         // Then
-        then(articleRepository).should().deleteById(articleId);
+        then(articleRepository).should().deleteByIdAndUserAccount_UserId(articleId, userId);
     }
 
     @DisplayName("게시글 수를 조회하면, 게시글 수를 반환한다")
@@ -271,7 +279,7 @@ class ArticleServiceTest {
                 "password",
                 "uno@mail.com",
                 "Uno",
-                null
+                "This is memo"
         );
     }
 
@@ -280,7 +288,7 @@ class ArticleServiceTest {
                 createUserAccount(),
                 "title",
                 "content",
-                "blue"
+                "#java"
         );
         ReflectionTestUtils.setField(article, "id", 1L);
 
@@ -289,7 +297,7 @@ class ArticleServiceTest {
 
 
     private ArticleDto createArticleDto() {
-        return createArticleDto("title", "content","hashtag");
+        return createArticleDto("title", "content","#java");
     }
 
     private ArticleDto createArticleDto(String title, String content, String hashtag) {
@@ -300,9 +308,9 @@ class ArticleServiceTest {
                 content,
                 hashtag,
                 LocalDateTime.now(),
-                "son",
+                "Uno",
                 LocalDateTime.now(),
-                "Son");
+                "Uno");
     }
 
     private UserAccountDto createUserAccountDto() {
