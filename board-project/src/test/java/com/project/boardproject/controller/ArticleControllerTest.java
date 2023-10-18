@@ -1,6 +1,5 @@
 package com.project.boardproject.controller;
 
-import com.project.boardproject.config.SecurityConfig;
 import com.project.boardproject.config.TestSecurityConfig;
 import com.project.boardproject.domain.constant.FormStatus;
 import com.project.boardproject.domain.constant.SearchType;

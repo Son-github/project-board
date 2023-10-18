@@ -3,7 +3,6 @@ package com.project.boardproject.controller;
 
 import com.project.boardproject.domain.constant.FormStatus;
 import com.project.boardproject.domain.constant.SearchType;
-import com.project.boardproject.dto.UserAccountDto;
 import com.project.boardproject.dto.request.ArticleRequest;
 import com.project.boardproject.dto.response.ArticleResponse;
 import com.project.boardproject.dto.response.ArticleWithCommentsResponse;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
