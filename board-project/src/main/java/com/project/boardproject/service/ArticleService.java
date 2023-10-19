@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -37,7 +38,10 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
             case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
-            case HASHTAG -> articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDto::from);
+            case HASHTAG -> articleRepository.findByHashtagNames(
+
+                    Arrays.stream(searchKeyword.split(" ")).toList(), pageable
+            ).map(ArticleDto::from);
         };
     }
 
@@ -74,7 +78,6 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
                 if (dto.content() != null) {
                     article.setContent(dto.content());
                 }
-                article.setHashtag(dto.hashtag());
             }
         } catch (EntityNotFoundException e){
             log.warn("게시글 업데이트 실패. 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
@@ -91,12 +94,12 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
 
 
     @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticlesViaHashtag(String hashtag, Pageable pageable) {
-        if (hashtag == null || hashtag.isBlank()) {
+    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
+        if (hashtagName == null || hashtagName.isBlank()) {
             return Page.empty(pageable);
         }
 
-        return articleRepository.findByHashtag(hashtag, pageable).map(ArticleDto::from);
+        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable).map(ArticleDto::from);
     }
 
     public List<String> getHashtags() {
