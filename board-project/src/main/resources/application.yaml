@@ -13,10 +13,9 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/board
-    username: root
-    password: test
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://localhost:5432/board
+    username: jonginson
+    password: ks929623!!
 
   jpa:
     defer-datasource-initialization: true
