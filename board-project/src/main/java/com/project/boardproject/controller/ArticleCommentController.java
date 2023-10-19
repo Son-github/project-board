@@ -1,8 +1,7 @@
 package com.project.boardproject.controller;
 
-import com.project.boardproject.dto.UserAccountDto;
+
 import com.project.boardproject.dto.request.ArticleCommentRequest;
-import com.project.boardproject.dto.request.ArticleRequest;
 import com.project.boardproject.dto.security.BoardPrincipal;
 import com.project.boardproject.service.ArticleCommentService;
 import lombok.RequiredArgsConstructor;

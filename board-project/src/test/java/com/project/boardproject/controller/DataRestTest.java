@@ -21,12 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional // Test에서 동작하는 기능들 RollBack
 @AutoConfigureMockMvc
 @SpringBootTest
-public class DataRestTest {
+class DataRestTest {
 
     private final MockMvc mvc;
 
     @Autowired
-    public DataRestTest(MockMvc mvc) {
+    DataRestTest(MockMvc mvc) {
         this.mvc = mvc;
     }
 
