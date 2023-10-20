@@ -24,7 +24,7 @@ class MainControllerTest {
 
 
 
-    @Disabled("왜안됌?")
+    @Disabled
     @DisplayName("[view][GET] 루트 페이지 -> 게시글 리스트 (게시판) 페이지 Redirection")
     @Test
     void givenNothing_whenRequestingRootPage_thenRedirectsToArticlesPage() throws Exception {
