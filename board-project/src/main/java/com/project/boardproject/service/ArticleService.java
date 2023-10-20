@@ -1,11 +1,13 @@
 package com.project.boardproject.service;
 
 import com.project.boardproject.domain.Article;
+import com.project.boardproject.domain.Hashtag;
 import com.project.boardproject.domain.UserAccount;
 import com.project.boardproject.domain.constant.SearchType;
 import com.project.boardproject.dto.ArticleDto;
 import com.project.boardproject.dto.ArticleWithCommentsDto;
 import com.project.boardproject.repository.ArticleRepository;
+import com.project.boardproject.repository.HashtagRepository;
 import com.project.boardproject.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,8 +28,10 @@ import java.util.List;
 @Service
 public class ArticleService {  // command+shift+t를 누르면 동일한 위치에 test파일 생성
 
+    private final HashtagService hashtagService;
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -61,7 +67,11 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
 
     public void saveArticle(ArticleDto dto) {
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-        articleRepository.save(dto.toEntity(userAccount));
+        Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+
+        Article article = dto.toEntity(userAccount);
+        article.addHashtags(hashtags);
+        articleRepository.save(article);
 
     }
 
@@ -78,6 +88,17 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
                 if (dto.content() != null) {
                     article.setContent(dto.content());
                 }
+
+                Set<Long> hashtagIds = article.getHashtags().stream()
+                        .map(Hashtag::getId)
+                        .collect(Collectors.toUnmodifiableSet());
+                article.clearHashtags();
+                articleRepository.flush();
+
+                hashtagIds.forEach(hashtagService::deleteHashtagWithoutArticles);
+
+                Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+                article.addHashtags(hashtags);
             }
         } catch (EntityNotFoundException e){
             log.warn("게시글 업데이트 실패. 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
@@ -85,7 +106,15 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
     }
 
     public void deleteArticle(long articleId, String userId) {
+        Article article = articleRepository.getReferenceById(articleId);
+        Set<Long> hashtagIds = article.getHashtags().stream()
+                        .map(Hashtag::getId)
+                                .collect(Collectors.toUnmodifiableSet());
+
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
+        articleRepository.flush();
+
+        hashtagIds.forEach(hashtagService::deleteHashtagWithoutArticles);
     }
 
     public long getArticleCount() {
@@ -103,7 +132,23 @@ public class ArticleService {  // command+shift+t를 누르면 동일한 위치�
     }
 
     public List<String> getHashtags() {
-        return articleRepository.findAllDistinctHashtags();
+        return hashtagRepository.findAllHashtagNames();
+    }
+
+    private Set<Hashtag> renewHashtagsFromContent(String content) {
+        Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
+        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
+        Set<String> existingHashtagNames = hashtags.stream()
+                .map(Hashtag::getHashtagName)
+                .collect(Collectors.toUnmodifiableSet());
+
+        hashtagNamesInContent.forEach(newHashtagName -> {
+            if (!existingHashtagNames.contains(newHashtagName)) {
+                hashtags.add(Hashtag.of(newHashtagName));
+            }
+        });
+
+        return hashtags;
     }
 
 }
