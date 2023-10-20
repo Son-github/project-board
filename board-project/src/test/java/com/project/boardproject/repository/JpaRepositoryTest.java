@@ -1,10 +1,14 @@
 package com.project.boardproject.repository;
 
 import com.project.boardproject.domain.Article;
+import com.project.boardproject.domain.ArticleComment;
 import com.project.boardproject.domain.Hashtag;
 import com.project.boardproject.domain.UserAccount;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -23,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(JpaRepositoryTest.TestJpaConfig.class)
 @DataJpaTest
 class JpaRepositoryTest {
+
+    Logger log = LoggerFactory.getLogger(JpaRepositoryTest.class);
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
@@ -111,6 +117,70 @@ class JpaRepositoryTest {
                 .isEqualTo(previousArticleCommentCount- deletedCommentSize);
     }
 
+    @DisplayName("대댓글 조회 테스트")
+    @Test
+    void givenParentCommentId_whenSelecting_thenReturnsChildComments() {
+        // Given
+
+        // When
+        Optional<ArticleComment> parentComment = articleCommentRepository.findById(1L);
+
+        // Then
+        assertThat(parentComment).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(4);
+    }
+
+    @DisplayName("댓글에 대댓글 삽입 테스트")
+    @Test
+    void givenParentComment_whenSaving_thenInsertsChildComment() {
+        // Given
+        ArticleComment parentComment = articleCommentRepository.getReferenceById(1L);
+        ArticleComment childComment = ArticleComment.of(
+                parentComment.getArticle(),
+                parentComment.getUserAccount(),
+                "대댓글"
+        );
+
+        // When
+        parentComment.addChildComment(childComment);
+        articleCommentRepository.flush();
+
+        // Then
+        assertThat(articleCommentRepository.findById(1L)).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(5);
+
+    }
+
+    @DisplayName("댓글 삭제와 대댓글 전체 연동 삭제 테스트")
+    @Test
+    void givenArticleCommentHavingChildComments_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        ArticleComment parentComment = articleCommentRepository.getReferenceById(1L);
+        long previousArticleCommentCount = articleCommentRepository.count();
+
+        // When
+        articleCommentRepository.delete(parentComment);
+
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5);
+    }
+    @DisplayName("댓글 삭제와 대댓글 전체 연동 삭제 테스트 - 댓글 ID + 유저 ID")
+    @Test
+    void givenArticleCommentIdHavingChildCommentsAndUserId_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        long previousArticleCommentCount = articleCommentRepository.count();
+
+        // When
+        articleCommentRepository.deleteByIdAndUserAccount_UserId(1L, "uno");
+
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5);
+    }
+
     @DisplayName("[Querydsl] 전체 hashtag 리스트에서 이름만 조회하기")
     @Test
     void givenNothing_whenQueryingHashtags_thenReturnsHashtagNames() {
@@ -122,7 +192,6 @@ class JpaRepositoryTest {
         // Then
         assertThat(hashtagNames).hasSize(19);
     }
-
     @DisplayName("[Querydsl] hashtag로 페이징된 게시글 검색하기")
     @Test
     void givenHashtagNamesAndPageable_whenQueryingArticles_thenReturnArticlePage() {
@@ -135,6 +204,7 @@ class JpaRepositoryTest {
 
         // When
         Page<Article> articlePage = articleRepository.findByHashtagNames(hashtagNames, pageable);
+        log.info("articlePage: {}", articlePage.getContent());
 
         // Then
         assertThat(articlePage.getContent()).hasSize(pageable.getPageSize());
