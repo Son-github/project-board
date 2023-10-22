@@ -1,6 +1,5 @@
 package com.project.boardproject.config;
 
-import com.project.boardproject.domain.UserAccount;
 import com.project.boardproject.dto.UserAccountDto;
 import com.project.boardproject.dto.security.BoardPrincipal;
 import com.project.boardproject.repository.UserAccountRepository;
@@ -9,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;

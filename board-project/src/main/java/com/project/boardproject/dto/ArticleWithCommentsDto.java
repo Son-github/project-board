@@ -1,7 +1,6 @@
 package com.project.boardproject.dto;
 
 import com.project.boardproject.domain.Article;
-import com.project.boardproject.domain.Hashtag;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;

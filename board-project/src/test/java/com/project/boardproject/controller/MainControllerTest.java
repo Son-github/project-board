@@ -2,7 +2,6 @@ package com.project.boardproject.controller;
 
 
 import com.project.boardproject.config.TestSecurityConfig;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
