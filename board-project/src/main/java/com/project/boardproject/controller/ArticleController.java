@@ -9,7 +9,6 @@ import com.project.boardproject.dto.response.ArticleWithCommentsResponse;
 import com.project.boardproject.dto.security.BoardPrincipal;
 import com.project.boardproject.service.ArticleService;
 import com.project.boardproject.service.PaginationService;
-import io.micrometer.core.instrument.search.Search;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

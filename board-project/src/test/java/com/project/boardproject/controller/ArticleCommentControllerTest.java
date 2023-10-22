@@ -1,6 +1,5 @@
 package com.project.boardproject.controller;
 
-import com.project.boardproject.config.SecurityConfig;
 import com.project.boardproject.config.TestSecurityConfig;
 import com.project.boardproject.dto.ArticleCommentDto;
 import com.project.boardproject.dto.request.ArticleCommentRequest;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
