@@ -14,8 +14,8 @@ logging:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/board
-    username: jonginson
-    password: ks929623!!
+    username: ******
+    password: ******
 
   jpa:
     defer-datasource-initialization: true
